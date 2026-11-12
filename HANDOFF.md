@@ -7,9 +7,9 @@ What Justin does, then what the bot does on its own. Follows the factory PLAYBOO
 1. **Account.** Make a new Grok account for the **Incubator** only (not one another business already uses: one account per business, and every bot on an account shares one computer). Sign in at x.ai/bot. Check the plan covers bots and routines. The bot never buys a plan.
 2. **Desktop app.** Open the Grok desktop app. Setup runs in the one-to-one chat there (approval, secret and sign-in requests only show there).
 3. **The bot.** Create one bot named **Incubator**, pin it, and set Settings → General → Bot → Timezone to **UTC**.
-4. **The pack.** Download `idea-incubator.zip` from the factory's release `idea-incubator-v1` (`<PACK_RELEASE_URL>`, set at intake), attach it to the first message *(zip route unverified)* and paste:
+4. **The pack: one link.** Paste the line below into the new bot. If the bot can't download, attach `idea-incubator.zip` from the same release instead *(zip route unverified)*:
 
-   > You are Incubator. Unpack the attached zip into /workspace/idea-incubator/repo/ and follow HANDOFF.md, Part 2, from step 1. Read MASTER-PROMPT.md and CHARTER.md first. Ask me one thing at a time. Nothing sends, posts, spends, trades or publishes until I say yes in this chat.
+   > You are Incubator. Download https://github.com/jbellsolutions/idea-incubator-grokbot/releases/latest/download/idea-incubator.zip, unpack it into /workspace/idea-incubator/repo/ and follow HANDOFF.md, Part 2, from step 1. Read MASTER-PROMPT.md and CHARTER.md first. Ask me one thing at a time. Nothing sends, posts, spends, trades or publishes until I say yes in this chat.
 
 5. **Auto-review rules.** At Part 2 step 4, paste the Ask-first lines it shows into Auto-review → Custom Rules.
 6. **Sign-ins and keys.** When it asks, sign in through Connect apps or **Take over**, one at a time: Claude Code (your Claude subscription), Gumroad, X. Keys go only through a secure secret card or the hidden terminal prompt with **Take over**. Rotate first any key ever pasted in a chat. Never give it a wallet key or seed phrase.
