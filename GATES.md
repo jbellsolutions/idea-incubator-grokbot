@@ -5,11 +5,12 @@ The factory's gates (PLAYBOOK §3), plus this bot's own. They never move.
 | Gate | Rule | Enforced by |
 |---|---|---|
 | Money movement | No real trade, swap, wallet funding, transfer, withdrawal or exchange connection, ever. A ticket for Justin, who places it himself | `trade_guard.py` (always held), Auto-review |
-| Keys that move money | No private key, seed phrase or exchange key with trade or withdraw rights on this computer. A wallet is a public address at most | Master prompt, `.env.example` |
+| Keys that move money | No private key, seed phrase or exchange key with trade or withdraw rights on the bot's computer or the worker box. A wallet is a public address at most | Master prompt, `.env.example` |
 | Spend | Never spend, buy, top up, start a paid run or a paid Orgo computer. Plan and cost go to `requests/justin/` | `spend_guard.py`, `orgo_guard.py`, Auto-review |
 | Sends and posts | A listing or post type goes out only when `standing-approvals.md` marks it `auto` | `send_guard.py`, Auto-review |
 | First public post | The first Gumroad listing and the first X post wait for Justin | Auto-review |
-| Public repos | Repos stay private; Justin makes one public | `claude-code-runner/settings.json`, Auto-review |
+| Public repos | Repos stay private; Justin makes one public | `worker.py` pushes only to private repos; `claude-code-runner/settings.json`, Auto-review |
+| Worker box | GrokBot hands work over only through desk orders; no order asks a lane to spend, trade, post, send, publish or delete. The worker's CLIs run as a user that can't read its keys. A new droplet or computer is spend: Justin's yes | `desk.py` (one writer per folder), `worker.py`, the two unix users, `spend_guard.py` |
 | Orgo | Every call checked; the computers on the never-touch list (given at intake) never; no stop, delete or wipe; only computers Justin named | `orgo_guard.py` (also inside `orgo.py`) |
 | Justin's X | Products only, at most 2 posts a day, no DMs, follows or replies to strangers | The promoter prompt, `send_guard.py` |
 | Stop | `context/STOP` stops everything | Every guard |

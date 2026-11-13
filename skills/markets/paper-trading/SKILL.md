@@ -10,10 +10,10 @@ PAPER only. Never place a real order, fund or connect a wallet, transfer, hold a
 
 ## Ledger commands
 ```
-python3 repo/guards/scripts/paper_ledger.py open <strategy> <symbol> <long|short> <size-usd> <entry-price> "<thesis>"
-python3 repo/guards/scripts/paper_ledger.py mark <symbol> <price>       # once per open symbol, current price
-python3 repo/guards/scripts/paper_ledger.py close <id> <exit-price> "<reason>"
-python3 repo/guards/scripts/paper_ledger.py report [--strategy S]      # numbers for the review
+python3 /opt/incubator/repo/guards/scripts/paper_ledger.py open <strategy> <symbol> <long|short> <size-usd> <entry-price> "<thesis>"
+python3 /opt/incubator/repo/guards/scripts/paper_ledger.py mark <symbol> <price>       # once per open symbol, current price
+python3 /opt/incubator/repo/guards/scripts/paper_ledger.py close <id> <exit-price> "<reason>"
+python3 /opt/incubator/repo/guards/scripts/paper_ledger.py report [--strategy S]      # numbers for the review
 ```
 `<strategy>` names the source (`signals`, `x-scout`, or `<creator>-<strategy>`). The ledger itself holds any open over 5% of the bankroll per position or 30% open in total. Always put the source in the thesis (signal, X scout row, or `creator/strategy`). Mark open trades at least once per daily run.
 
@@ -52,8 +52,8 @@ A strategy is ticket-ready only when all hold:
 - the backtest (see `creator-follow`) and the paper results agree in direction
 
 Then:
-1. `python3 repo/guards/scripts/trade_guard.py ticket <symbol> <side> <size-usd> "<thesis with paper numbers>"`. It prints `held` and files the ticket.
+1. `python3 /opt/incubator/repo/guards/scripts/trade_guard.py ticket <symbol> <side> <size-usd> "<thesis with paper numbers>"`. It prints `held` and files the ticket.
 2. Write `requests/justin/<date>-<strategy>.md` with the weekly report numbers, backtest summary, risks and proposed size.
 3. Keep paper trading it. Never treat a ticket as approved until Justin says so, and even then the bot does not execute.
 
-End each run: `python3 repo/guards/scripts/beat.py write markets '<one line>' found=N drafted=N`.
+End each run: `python3 /opt/incubator/repo/guards/scripts/beat.py write markets '<one line>' found=N drafted=N`.

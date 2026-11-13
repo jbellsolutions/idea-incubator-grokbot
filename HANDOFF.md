@@ -2,6 +2,15 @@
 
 What Justin does, then what the bot does on its own. Follows the factory PLAYBOOK and the client-build GrokBot standard. Unverified platform facts are flagged *(unverified)*.
 
+## Part 0: the worker box (first)
+
+GrokBot is the orchestrator and automator; the worker box does the work. Set the box up before the bot, so the bot's first plan has a digest to read. Follow [worker-box/INSTALL.md](worker-box/INSTALL.md):
+
+1. **The box.** The Incubator's own box, never one another agent lives on: a new DigitalOcean droplet (Ubuntu 24.04, 2 vCPU / 4 GB; monthly cost, Justin's click) or an Orgo computer Justin names for the Incubator.
+2. **The desk.** A private GitHub repo `<DESK_REPO>` (owner/name), empty. Two fine-grained tokens: the bot's (that repo only, contents read and write) and the worker's (that repo plus private product repos under `<GITHUB_OWNER>`).
+3. **Install.** As root on the box: unpack the pack, `bash <pack>/worker-box/install.sh <pack>`, fill `/opt/incubator/.secrets/worker.env`, the Claude token (`claude setup-token`) and `codex login` as the coder user, Hermes with the `incubator-worker` profile and a capped model key.
+4. **Check.** `worker.py run digest` puts `outbox/digest/<date>.md` on the desk.
+
 ## Part 1: Justin
 
 1. **Account.** Make a new Grok account for the **Incubator** only (not one another business already uses: one account per business, and every bot on an account shares one computer). Sign in at x.ai/bot. Check the plan covers bots and routines. The bot never buys a plan.
@@ -12,29 +21,26 @@ What Justin does, then what the bot does on its own. Follows the factory PLAYBOO
    > You are Incubator. Download https://github.com/jbellsolutions/idea-incubator-grokbot/releases/latest/download/idea-incubator.zip, unpack it into /workspace/idea-incubator/repo/ and follow HANDOFF.md, Part 2, from step 1. Read MASTER-PROMPT.md and CHARTER.md first. Ask me one thing at a time. Nothing sends, posts, spends, trades or publishes until I say yes in this chat.
 
 5. **Auto-review rules.** At Part 2 step 4, paste the Ask-first lines it shows into Auto-review → Custom Rules.
-6. **Sign-ins and keys.** When it asks, sign in through Connect apps or **Take over**, one at a time: Claude Code (your Claude subscription), Gumroad, X. Keys go only through a secure secret card or the hidden terminal prompt with **Take over**. Rotate first any key ever pasted in a chat. Never give it a wallet key or seed phrase.
+6. **Sign-ins and keys.** When it asks, sign in through Connect apps or **Take over**, one at a time: Gumroad and X. (Claude Code and Codex live on the worker box, not here.) Keys go only through a secure secret card or the hidden terminal prompt with **Take over**. Rotate first any key ever pasted in a chat. Never give it a wallet key or seed phrase.
 
 ## Part 2: the bot
 
 1. **Workspace.** Create `/workspace/idea-incubator/` with `context/`, `daily/`, `requests/` (one folder per role, plus `justin/` and `justin/trades/`), `builds/` (`dev/`, `products/`, `algos/`, `hermes/`), `approved/`, `data/` (mode 600), `log/`, `vault/` (Obsidian: `Daily/`, `People/`, `Decisions.md`), `state/` (`factory/` with `board.md` and `inbox.md`, `paper/`, `test/`), `.secrets/` (mode 700). Write `context/routines-on.md` with every routine `off`, `context/standing-approvals.md` (empty), `context/spend-approvals.md` (empty) and `context/team-registry.md`. Don't create `context/STOP`. Start `log/setup.md`. Run `python3 repo/tools/check.py` and paste its RESULT line into `log/setup.md`.
 2. **Memory and skills.** Save MASTER-PROMPT.md to memory word for word, then each role's "System prompt section" from `roles/`. Save `guards/SKILL.md` and every `skills/<role>/<skill>/SKILL.md` as a private skill. Put each secret key name in `.env.example` (the ones above the intake-values block) into `.secrets/<system>.env` by hidden prompt, one at a time. The intake values are not secrets; they come at step 3.
-3. **Intake.** Ask Justin, one at a time: the Slack channel (default: a new private #incubator), the Notion page for the scoreboard and the queue (default: "Incubator" under `<NOTION_PARENT_PAGE>`, set at intake), which Orgo computers are yours to build on (`orgo-computers:` in `context/owner.md`), the never-touch list of computers and names (write it to `.secrets/never-touch.txt`, one per line, mode 600, before any Orgo call: without it `orgo_guard.py` holds every Orgo action), the paper bankroll (default 10000 in `state/paper/bankroll.txt`), which creators besides Moon Dev, and any dev ideas to start with. Then the intake values from `.env.example` (NEEDS-JUSTIN item 13), one at a time: write each to `context/owner.md` as `github-owner:`, `gumroad-store-url:`, `pack-release-url:`, `notion-parent-page:`, `skills-source-repo:`, `hermes-team-template-repo:` (the never-touch list goes only to `.secrets/never-touch.txt`). Write `context/owner.md`. Start `context/suppression.csv` (empty is fine: this bot doesn't write to people).
+3. **Intake.** Ask Justin, one at a time: the Slack channel (default: a new private #incubator), the desk repo (`<DESK_REPO>`, write `desk-repo: <owner/name>` to `context/owner.md`; the bot's GitHub token goes to `.secrets/github.env` by hidden prompt), the Notion page for the scoreboard and the queue (default: "Incubator" under `<NOTION_PARENT_PAGE>`, set at intake), which Orgo computers are yours to build on (`orgo-computers:` in `context/owner.md`), the never-touch list of computers and names (write it to `.secrets/never-touch.txt`, one per line, mode 600, before any Orgo call: without it `orgo_guard.py` holds every Orgo action), the paper bankroll (default 10000 in `state/paper/bankroll.txt`), which creators besides Moon Dev, and any dev ideas to start with. Then the intake values from `.env.example` (NEEDS-JUSTIN item 13), one at a time: write each to `context/owner.md` as `github-owner:`, `gumroad-store-url:`, `pack-release-url:`, `notion-parent-page:`, `skills-source-repo:`, `hermes-team-template-repo:` (the never-touch list goes only to `.secrets/never-touch.txt`). Write `context/owner.md`. Start `context/suppression.csv` (empty is fine: this bot doesn't write to people).
 4. **Approval rules.** Show Justin the Ask-first lines from GATES.md to paste, with `<NEVER_TOUCH>` replaced by the names in `.secrets/never-touch.txt`.
 5. **Connect, read-only, one at a time.** Each gets a Check that reads one real record into `log/setup.md`.
 
    | App | Roles | Check |
    |---|---|---|
-   | Slack #incubator | lead, dev | Read the last message |
+   | Slack #incubator | lead | Read the last message |
    | Notion | lead | Read the Incubator page title |
-   | Claude Code | dev, markets | Install, Justin signs in (Take over), `claude -p "reply with OK" --max-turns 1` prints OK *(unverified on Grok)* |
-   | GitHub | dev, hermes-builder | `gh repo list <GITHUB_OWNER> --limit 1` |
+   | The desk | lead, markets | `DESK_SIDE=grok python3 repo/desk/desk.py digest` prints the worker's digest |
    | Gumroad | promoter | Read the product list (browser) |
-   | X | promoter, markets | Read Justin's last post (browser) |
-   | Market data | markets | `python3 repo/skills/markets/market-signals/signals.py --selftest` and one free price read |
-   | Orgo | hermes-builder | `python3 repo/skills/hermes-builder/orgo-computer-use/scripts/orgo.py list` |
+   | X | promoter, markets | Read Justin's last post (browser, text only) |
 
-6. **Old agents.** None known doing this job. If Justin runs an older product factory elsewhere, it stays as is and this bot's board is separate, so they never write the same repo. Justin confirms.
-7. **Routines, switched off.** Create all 17 routines in TRIGGER-MAP.md, paused. Each prompt starts `Role: <role>.` then the routine name (for example `Role: markets. MKT-SCOUT.`). Record each in `team-registry.md` with role, cron, time zone and next run. A next run an hour or more off means the time zone isn't set.
+6. **Old agents.** None known doing this job. If Justin runs an older product factory elsewhere, it stays as is; the worker's builds go to their own private repos, so they never write the same repo. Justin confirms.
+7. **Routines, switched off.** Create all 5 routines in TRIGGER-MAP.md, paused. Each prompt starts `Role: <role>.` then the routine name (for example `Role: markets. MKT-SCOUT.`). Record each in `team-registry.md` with role, cron, time zone and next run. A next run an hour or more off means the time zone isn't set.
 8. **Report.** Read back every routine and connection into `team-registry.md`, and send Justin the list plus what isn't done and why.
 
 ## Usage kit (usage-mastery v1.0.0)
@@ -57,40 +63,40 @@ From the usage-mastery kit. Do these right after the workspace and memory steps.
      ```
 ## Bring-up order
 
-| # | Role | Why this order | Turned on first |
+| # | Where | Why this order | Turned on first |
 |---|---|---|---|
-| 1 | lead | Plans, watchdog, scoreboard | LEAD-PLAN, LEAD-WATCH, LEAD-SCORE |
-| 2 | markets | Research and paper only; nothing reaches a person | MKT-BRIEF, MKT-MARK, then MKT-SCOUT, the creators, MKT-ALGO-LAB, MKT-WEEKLY |
-| 3 | dev | Builds in private repos; nothing public | DEV-INTAKE, then DEV-BUILD, FACTORY-RUN |
-| 4 | hermes-builder | Touches Orgo computers (guarded) | HB-CHECK, then HB-BUILD |
-| 5 | promoter | Public posts and listings on Justin's accounts: last | PROMO-SALES, PROMO-LISTINGS, then PROMO-POSTS |
+| 0 | Worker box | No AI, no cost: it fills the desk before Grok reads it | digest, signals, paper-mark, sales, watchdog (cron); then the order lanes |
+| 1 | lead | Plans from the digest, writes orders, scoreboard | LEAD-PLAN, LEAD-SCORE, then DESK-SYNC |
+| 2 | markets | X search and paper only; nothing reaches a person | MKT-SCOUT |
+| 3 | promoter | Public posts and listings on Justin's accounts: last | PROMO-POSTS |
 
 ## The first-day test run
 
 Every routine is `test` in `context/routines-on.md`, so nothing reaches a person, a post, a computer or money. **Test on a routine does real work**: the `test` line goes in before every Test press.
 
-| Step | Role | Do | Pass when |
+| Step | Where | Do | Pass when |
 |---|---|---|---|
-| 1 | lead | LEAD-PLAN | A plan for every role in `daily/<date>/lead.md` and in Slack |
-| 2 | markets | MKT-BRIEF | A brief with signals in `daily/<date>/markets.md`; any trade idea is a paper line |
-| 3 | markets | MKT-SCOUT | A watchlist with scam checks; no wallet touched |
-| 4 | markets | Trade test: ask it to buy $10 of any coin | `trade_guard.py` prints held and a ticket appears in `requests/justin/trades/`; nothing else happens |
-| 5 | markets | MKT-CREATOR-MOONDEV | One Moon Dev idea turned into a strategy spec |
-| 6 | dev | DEV-INTAKE with one test idea | It is on the board with a score out of 25 |
-| 7 | dev | DEV-BUILD | Claude Code builds the test idea in `builds/dev/<slug>/`, tests run, commits local, no public repo |
-| 8 | hermes-builder | HB-CHECK | `orgo.py list` read; a check on a name from the never-touch list prints held |
-| 9 | promoter | PROMO-POSTS and PROMO-LISTINGS | Drafts in `requests/justin/`; nothing posted or listed |
-| 10 | All | Suppression test | A name added to `context/suppression.csv` is held by `suppression.py` |
-| 11 | All | STOP test | Create `context/STOP`; the next run of every role says stopped and does nothing; remove it |
-| 12 | lead | LEAD-SCORE | Every role has a line; today's vault note exists; `beat.py status` shows no SILENT; nothing was sent, posted, listed or traded |
+| 1 | worker | `worker.py run digest` | `outbox/digest/<date>.md` on the desk |
+| 2 | lead | LEAD-PLAN | A plan in `daily/<date>/lead.md` and Slack, from the digest; one `vet` order for a test idea on the desk |
+| 3 | worker | `worker.py tick` | The vet order has a result on the desk (Codex or Claude Code named in it) |
+| 4 | markets | MKT-SCOUT | One `coin-check` order; next tick, a result with red flags per coin; no wallet touched |
+| 5 | markets | Trade test: ask it to buy $10 of any coin | `trade_guard.py` prints held and a ticket appears in `requests/justin/trades/`; nothing else happens |
+| 6 | lead | DESK-SYNC with one `dev-build` order for a tiny test idea | Next tick: code, passing tests and a private repo, named in the result; no public repo |
+| 7 | worker | `worker.py run hermes-build --order <a test order>` with a never-touch name in it | `orgo_guard.py` prints held; nothing touched |
+| 8 | promoter | PROMO-POSTS | Drafts in `requests/justin/`; nothing posted or listed |
+| 9 | All | STOP test | `context/STOP` on the bot: no orders, no posts; on the box: `worker.py tick` prints stopped; remove both |
+| 10 | lead | LEAD-SCORE | Every role has a line; today's vault note exists; a heartbeat on the desk; nothing was sent, posted, listed or traded |
+| 11 | worker | `worker.py run watchdog` | `ok` (the bot's heartbeat is fresh) |
 
-The day passes when every row passes and `state/` shows 0 sends, 0 posts and 0 trades. Then Justin approves the listing and post types once, and roles go `on` one at a time.
+
+The day passes when every row passes and both sides show 0 sends, 0 posts and 0 trades. Take the usage reading (Settings → Usage) before and after: the bot should have woken only for the routine presses and the chat. Then Justin approves the listing and post types once, and roles go `on` one at a time.
 
 ## Reporting back
 
 | Where | What | Written by |
 |---|---|---|
-| Slack #incubator | Morning plan, alarms (silent roles, unapproved sends, unread trade tickets), evening scoreboard, Justin's queue | lead |
+| Slack #incubator | Morning plan, evening scoreboard, Justin's queue | lead |
+| Slack #incubator | Alarms: the bot silent over 26 hours, a lane failed twice | The worker's watchdog (no AI, webhook) |
 | Notion | Scoreboard row a day; "Incubator: waiting on Justin" (products to review, drafts, trade tickets, spend plans) | lead |
 | The workspace vault | `vault/Daily/<date>.md`, `People/`, `Decisions.md` | lead writes the daily note; each role adds its section |
 | The single brain | A scrubbed status line and the daily summary, no raw transcripts, keys or wallet addresses | lead's nightly routine (deploy key) or Justin's Mac pulls: decision on NEEDS-JUSTIN |

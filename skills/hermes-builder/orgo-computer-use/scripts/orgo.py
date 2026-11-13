@@ -55,7 +55,7 @@ import urllib.request
 
 API = os.environ.get("ORGO_API_BASE", "https://www.orgo.ai/api").rstrip("/")
 KEY = None
-ENV_FILES = [os.path.expanduser(p) for p in ("/workspace/idea-incubator/.secrets/orgo.env", "/workspace/idea-incubator/.secrets/.env")]
+ENV_FILES = [os.path.expanduser(p) for p in ("/opt/incubator/.secrets/worker.env", "/opt/incubator/.secrets/orgo.env", "/opt/incubator/.secrets/.env")]
 STRIP_FIELDS = {"vnc_password", "connection_url", "url", "owner_email", "instance_details", "hostname", "fly_instance_id", "instance_id"}
 
 # --- secrets ------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ def load_key(required=True):
                     if m:
                         key = m.group(1).strip("\"'")
     if not key and required:
-        die("ORGO_API_KEY is not set (environment or /workspace/idea-incubator/.secrets/). Put it in requests/justin/ as a need.")
+        die("ORGO_API_KEY is not set (environment or /opt/incubator/.secrets/). Put it in requests/justin/ as a need.")
     return key
 
 

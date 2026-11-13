@@ -5,13 +5,15 @@ description: Turn rough dev ideas into small, finished, tested products with a l
 
 # Software factory
 
+Runs on the worker box, inside Claude Code or Codex (`claude-code-runner`), started by a desk order or the worker's Mon/Thu cron. GrokBot only orders it and reads the result. On the box the folder you are in is the product; the desk result is the record, so write the vet, spec and review into files here (`VET.md`, `SPEC.md`, `marketing/REVIEW.md`) and say in your last lines where the item stands (Queue, Maybe, Killed, Building, Ready for review).
+
 Ported from Justin's own product factory (a Claude Code agent that made Tube Timer). Same process, run on this bot's computer, with Claude Code doing the coding through `claude-code-runner`.
 
 ## Hard rules
 
 1. **Nothing public without Justin.** Never make a repo public, publish a site, list on Gumroad, post anywhere, send a message or spend. Prepare it so Justin does each in a couple of minutes, then stop. Listings and posts are the promoter's drafts.
 2. **No accounts, passwords or keys** in products. Products work without the buyer making an account; "bring your own API key" is fine.
-3. **Each product is its own git repo** in `/workspace/idea-incubator/builds/products/<slug>/`; dev-only builds in `builds/dev/<slug>/`. Push only to a private repo (`gh repo create <GITHUB_OWNER>/<slug> --private`).
+3. **Each product is its own git repo** in `/opt/incubator/builds/products/<slug>/`; dev-only builds in `builds/dev/<slug>/`. Push only to a private repo (`gh repo create <GITHUB_OWNER>/<slug> --private`).
 4. **Honest copy.** No invented testimonials, user counts or results. Claims link to a source. Real limits go in the README.
 5. **Tested means you ran it.** Build it, run the main flows, save real screenshots. Say what you couldn't test.
 6. **Fewer, better.** One finished product beats three half-built. Kill weak ideas early and write why.

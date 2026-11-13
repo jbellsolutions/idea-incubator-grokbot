@@ -2,12 +2,8 @@
   "_doc": "Which role uses which skill and which account. tools/check.py reads this. skills: role -> skill folders under skills/<role>/ ('bot-guards' means guards/). accounts: name a role charter uses -> path in the pack that serves it (or null), and key names (SIGNIN for a sign-in Justin does).",
   "skills": {
     "lead": [
-      "bot-guards"
-    ],
-    "dev": [
       "bot-guards",
-      "software-factory",
-      "claude-code-runner"
+      "desk-orchestrator"
     ],
     "promoter": [
       "bot-guards",
@@ -16,13 +12,16 @@
     ],
     "markets": [
       "bot-guards",
-      "market-signals",
       "crypto-x-scout",
-      "creator-follow",
-      "paper-trading"
+      "paper-trading",
+      "market-signals",
+      "creator-follow"
+    ],
+    "dev": [
+      "software-factory",
+      "claude-code-runner"
     ],
     "hermes-builder": [
-      "bot-guards",
       "orgo-computer-use",
       "hermes-agent-builder"
     ]
@@ -38,12 +37,6 @@
       "path": null,
       "keys": [
         "NOTION_TOKEN"
-      ]
-    },
-    "Claude Code": {
-      "path": "skills/dev/claude-code-runner",
-      "keys": [
-        "SIGNIN"
       ]
     },
     "GitHub": {
@@ -65,15 +58,12 @@
         "SIGNIN"
       ]
     },
-    "Market data": {
-      "path": "skills/markets/market-signals",
-      "keys": []
-    },
-    "Orgo": {
-      "path": "skills/hermes-builder/orgo-computer-use",
+    "Desk": {
+      "path": "desk/desk.py",
       "keys": [
-        "ORGO_API_KEY"
+        "GITHUB_TOKEN"
       ]
     }
-  }
+  },
+  "_worker": "dev and hermes-builder are worker-box lanes, not Grok roles: the worker's CLIs and Hermes load these skills (worker-box/jobs.json). markets' market-signals and creator-follow also run on the worker."
 }

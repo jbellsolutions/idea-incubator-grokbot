@@ -4,7 +4,7 @@ Do these in order. Each step should take a couple of minutes.
 
 ## 1. GitHub (repo + free website)
 1. If needed, log in to GitHub in Terminal: `gh auth login`.
-2. Publish yourself from the bot's build (the bot never does this): `/workspace/idea-incubator/builds/products/<slug>`. Create `<GITHUB_OWNER>/<slug>` (public only on your word), push, turn on GitHub Pages from `/docs`, and upload `<release file>` as a Release.
+2. Publish yourself from the bot's build (the bot never does this): `/opt/incubator/builds/products/<slug>`. Create `<GITHUB_OWNER>/<slug>` (public only on your word), push, turn on GitHub Pages from `/docs`, and upload `<release file>` as a Release.
 3. Website: `https://<GITHUB_OWNER>.github.io/<slug>/`
 
 ## 2. Gumroad
@@ -21,4 +21,4 @@ Do these in order. Each step should take a couple of minutes.
 2. Post it with one of the short posts. Link to the website.
 
 ## 5. Tell the factory
-Move the item to **Launched** in `/workspace/idea-incubator/state/factory/board.md` (or add `> launched` under it and the next run will).
+Move the item to **Launched** in `/opt/incubator/state/factory/board.md` (or add `> launched` under it and the next run will).

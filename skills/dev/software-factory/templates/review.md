@@ -1,7 +1,7 @@
 # Review: <Product>
 
 **One line:** <what it does, for whom>
-**Repo:** `/workspace/idea-incubator/builds/products/<slug>` · **Price:** $<price> · **Vet score:** <n>/25
+**Repo:** `/opt/incubator/builds/products/<slug>` · **Price:** $<price> · **Vet score:** <n>/25
 
 ## Try it in 2 minutes
 

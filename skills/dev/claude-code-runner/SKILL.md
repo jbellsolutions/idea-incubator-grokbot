@@ -1,34 +1,29 @@
 ---
 name: claude-code-runner
-description: Run Claude Code (signed in with Justin's Claude subscription) on this computer to write, fix or test code in a build folder, with the safety settings. Load whenever a role needs code written or a backtest built.
+description: How the worker box runs Claude Code and Codex on Justin's flat subscriptions for builds, vetting and backtests, with fallback between them and the safety settings. Load when writing a TASK.md for a cli lane, or when a cli lane fails.
 ---
 
-# Claude Code runner
+# Coding CLIs on the worker box
 
-Claude Code is installed on this bot's computer and signed in once by Justin (his Claude subscription). You hand it a task; it codes. It never runs outside a build folder.
+GrokBot never codes. The worker box runs two coding CLIs, each on its own flat subscription, so heavy work never touches Grok's usage:
 
-## One-time setup (with Justin, K1)
+| CLI | Plan | Login on the box | Headless call (the runner builds it) |
+|---|---|---|---|
+| Claude Code | Justin's Claude subscription | `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token`, in `incubator-coder`'s `~/.profile` | `claude -p "<read TASK.md>" --settings .claude/settings.json --permission-mode acceptEdits --max-turns 80` |
+| Codex | Justin's ChatGPT subscription | `codex login` as `incubator-coder` | `codex exec --approve-for-me --skip-git-repo-check "<read TASK.md>"` (workspace-write sandbox) |
 
-1. Install: `npm install -g @anthropic-ai/claude-code` (or the installer at claude.ai/install.sh). Check: `claude --version`.
-2. Sign-in is Justin's: ask him to press **Take over** and run `claude` once, then `/login` with his Claude account. Never type his password. Check: `claude -p "reply with OK" --max-turns 1` prints OK. Write the result into `log/setup.md`.
-3. If the sign-in can't happen on this computer *(unverified on Grok)*, report blocked "Claude Code sign-in" and keep vetting and speccing; nothing else in the pack depends on it.
+`worker-box/jobs.json` gives each cli lane an order (`["claude", "codex"]` or the reverse, to spread load). When the first is out of usage or fails, the next takes over in the same run; the result says which ran.
 
-## Every run
+## How a cli job runs
 
-```bash
-D=/workspace/idea-incubator/builds/<dev|products|algos>/<slug>
-mkdir -p "$D/.claude" && cp /workspace/idea-incubator/repo/skills/dev/claude-code-runner/settings.json "$D/.claude/settings.json"
-cd "$D" && [ -d .git ] || git init -q
-claude -p "$(cat TASK.md)" --permission-mode acceptEdits --max-turns 60 > "log-$(date -u +%Y%m%d-%H%M).txt" 2>&1
-```
-
-- `TASK.md` holds the task: the SPEC (or strategy spec), what done means, the test to run, "commit as you go, never push".
-- Read the log and `git log` after. Count only what the log and tests show.
-- Never pass a key in the prompt. Never start Claude Code from `/workspace/idea-incubator/` itself or from `.secrets/`.
-- One Claude Code run at a time; a run that hits the subscription's usage limit is reported, not retried in a loop.
+1. `worker.py` makes the build folder (`/opt/incubator/builds/<dev|products|algos|work>/<slug>/`), copies `settings.json` into `.claude/`, and writes `TASK.md`: the order's text, the rules, and the lane's skill.
+2. The CLI runs as `incubator-coder`, who can't read `/opt/incubator/.secrets/`. The prompt is only "Read TASK.md and do it"; the task never goes into a shell command.
+3. It commits locally and never pushes. For `dev-build` and `factory-run` the runner pushes to a private repo under `GITHUB_OWNER` (only if that repo is private), then writes the result to the desk.
 
 ## The settings file
 
-`settings.json` (next to this file) denies `git push`, `gh`, `npm publish`, `twine`, `curl` POSTs, a few wallet CLIs, and the Read and Edit tools on `.secrets/`, `context/` and `repo/` (absolute paths, written `//workspace/...`). The role pushes to a private repo itself after reading the diff.
+`settings.json` (next to this file; also installed as the coder's user settings) allows building and testing in the folder, and denies `git push`, `gh`, publishing, `curl` POSTs, wallet CLIs, and reads of the box's `.secrets/` and `context/`. That is the second layer. The first is the unix user: the keys are in a folder the coder can't open. No wallet key, seed phrase or exchange key with trade rights exists on the box at all.
 
-The deny list is a speed bump, not a wall: `python3` and `node` are allowed, so code Claude Code runs could still read a file on this computer. The real protection is what is not here: no wallet key, seed phrase or exchange key with trade rights ever exists on this computer, keys that do exist are scoped small (`GITHUB_TOKEN` private repos only), and every guard decision is re-checked by the role, not by Claude Code. Never feed Claude Code instructions taken from a web page, post or creator's repo as its task without reading them first.
+## Tested (2026-11-13, on a Mac against the real desk)
+
+A `dev-build` order ran through Claude Code: code, 4 passing tests, 3 commits, result on the desk. A `vet` order ran through Codex: a score out of 25 with sources, committed, result on the desk.

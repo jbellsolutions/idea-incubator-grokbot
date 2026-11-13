@@ -1,0 +1,18 @@
+{
+  "_doc": "Every job the worker box runs. tier: script (no AI, free), cli (Claude Code or Codex on a flat subscription; cli lists the order to try, the next one takes over when one is out of usage or fails), hermes (an agent loop on a capped model key; only where a job needs one). started_by: a cron line (UTC, in crontab.txt) or 'order' (a desk work order from GrokBot). Grok never runs these; it only writes orders and reads results.",
+  "lanes": {
+    "signals":      {"tier": "script", "started_by": "10 12 * * *", "does": "Daily signals for the watchlist from free public candles; paper trades only on the signal rules"},
+    "paper-mark":   {"tier": "script", "started_by": "5 */6 * * *", "does": "Mark open paper positions at the public price; weekly report on Sundays"},
+    "coin-check":   {"tier": "script", "started_by": "order", "does": "Free-API checks on coins Grok's X scout found: liquidity, age, volume, pairs, red flags"},
+    "sales":        {"tier": "script", "started_by": "0 12 * * *", "does": "Gumroad sales, read-only, when a read token is set"},
+    "digest":       {"tier": "script", "started_by": "20 12 * * *", "does": "One short digest of the last day for Grok's morning plan"},
+    "watchdog":     {"tier": "script", "started_by": "50 * * * *", "does": "Alarm to Slack when Grok or the worker is silent over 26 hours, or a job failed twice"},
+    "dev-build":    {"tier": "cli", "cli": ["claude", "codex"], "started_by": "order", "push_private": true, "does": "Code out a dev idea in builds/dev/<slug>/ with the software-factory rules"},
+    "vet":          {"tier": "cli", "cli": ["codex", "claude"], "started_by": "order", "does": "Vet an idea out of 25 with web research; place it on the board"},
+    "factory-run":  {"tier": "cli", "cli": ["claude", "codex"], "started_by": "5 15 * * 1,4", "push_private": true, "does": "Pick, spec, build, test and package one product up to Ready for review"},
+    "creator-follow": {"tier": "cli", "cli": ["codex", "claude"], "started_by": "35 16 * * *", "does": "Read each creator's new public ideas; write testable strategy specs"},
+    "algo-lab":     {"tier": "cli", "cli": ["claude", "codex"], "started_by": "10 18 * * 2,5", "does": "Code and backtest queued strategy specs on historical data, out of sample"},
+    "hermes-build": {"tier": "hermes", "profile": "incubator-worker", "started_by": "order", "does": "Design and build a Hermes agent pack; install only on a computer Justin named"},
+    "ask":          {"tier": "hermes", "profile": "incubator-worker", "started_by": "order", "does": "Anything else Grok hands over that needs an agent loop"}
+  }
+}

@@ -1,0 +1,15 @@
+# Incubator worker box, system cron (UTC). Installed by install.sh for the `incubator` user.
+# GrokBot never runs these: it writes desk orders and reads the digest. No-AI jobs cost nothing;
+# cli jobs use the Claude and Codex subscriptions; hermes jobs use the capped model key.
+CRON_TZ=UTC
+SHELL=/bin/bash
+BOT_HOME=/opt/incubator
+*/10 * * * *  . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py tick >> /opt/incubator/log/tick.log 2>&1
+10 12 * * *   . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run signals >> /opt/incubator/log/jobs.log 2>&1
+5 */6 * * *   . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run paper-mark >> /opt/incubator/log/jobs.log 2>&1
+0 12 * * *    . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run sales >> /opt/incubator/log/jobs.log 2>&1
+20 12 * * *   . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run digest >> /opt/incubator/log/jobs.log 2>&1
+50 * * * *    . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run watchdog >> /opt/incubator/log/jobs.log 2>&1
+5 15 * * 1,4  . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run factory-run >> /opt/incubator/log/jobs.log 2>&1
+35 16 * * *   . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run creator-follow >> /opt/incubator/log/jobs.log 2>&1
+10 18 * * 2,5 . /opt/incubator/.secrets/worker.env; python3 /opt/incubator/repo/worker-box/bin/worker.py run algo-lab >> /opt/incubator/log/jobs.log 2>&1
