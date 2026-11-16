@@ -2,7 +2,7 @@
 """No-AI job: mark every open paper position at Coinbase's free public price; on Sundays put the weekly
 paper report on the desk. Paper only."""
 import json, time
-from _common import TODAY, WS, desk, ledger, price, state
+from _common import TODAY, WS, desk_put, ledger, price, state
 
 f = WS / "state" / "paper" / "ledger.jsonl"
 syms = set()
@@ -20,4 +20,4 @@ rep = ledger("report")
 print(rep)
 if time.gmtime().tm_wday == 6 and time.gmtime().tm_hour >= 18:
     out = state("paper", f"weekly-{TODAY}.md"); out.write_text(f"# Paper review {TODAY} (paper, not real money)\n\n```\n{rep}\n```\n")
-    print(desk("put", f"state/paper/weekly-{TODAY}.md", str(out))[1])
+    desk_put(f"state/paper/weekly-{TODAY}.md", out)

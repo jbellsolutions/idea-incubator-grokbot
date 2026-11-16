@@ -2,7 +2,7 @@
 """No-AI job: Gumroad sales of the last day, read-only (GUMROAD_ACCESS_TOKEN). Counts only Gumroad's own
 records. Puts state/sales/<date>.md on the desk. Without a token it says so and does nothing."""
 import os, time, urllib.parse
-from _common import TODAY, desk, http_json, state
+from _common import TODAY, desk_put, http_json, state
 
 tok = os.environ.get("GUMROAD_ACCESS_TOKEN", "")
 if not tok: print("no GUMROAD_ACCESS_TOKEN: sales not read"); raise SystemExit(0)
@@ -15,4 +15,4 @@ for s in sales:
 lines = [f"# Gumroad sales since {after}", "", "| Product | Sales | Revenue $ |", "|---|---|---|"] + [f"| {k} | {n} | {v:.2f} |" for k, (n, v) in by.items()]
 if not by: lines.append("| (none) | 0 | 0 |")
 out = state("sales", f"{TODAY}.md"); out.write_text("\n".join(lines) + "\n"); print("\n".join(lines))
-print(desk("put", f"state/sales/{TODAY}.md", str(out))[1])
+desk_put(f"state/sales/{TODAY}.md", out)

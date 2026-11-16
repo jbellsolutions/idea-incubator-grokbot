@@ -19,6 +19,11 @@ def desk(*a):
     r = subprocess.run([sys.executable, str(PACK / "desk" / "desk.py"), *a], capture_output=True, text=True, timeout=120)
     return r.returncode, (r.stdout or r.stderr).strip()
 
+def desk_put(path, file):
+    """Put a local file on the desk. A failed write fails the job, so the result and the watchdog show it."""
+    code, msg = desk("put", path, str(file)); print(msg)
+    if code: sys.exit(f"desk write failed: {path}")
+
 def state(*p):
     f = WS.joinpath("state", *p); f.parent.mkdir(parents=True, exist_ok=True); return f
 

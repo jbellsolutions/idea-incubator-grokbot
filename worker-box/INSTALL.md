@@ -18,12 +18,12 @@ The Incubator's own box, never one another agent lives on:
 
 ## Install (Justin starts it, the steps are copy-paste)
 
-1. On the box, as root: download the pack zip, unpack it, run `bash <pack>/worker-box/install.sh <pack>`.
+1. On the box, as root: `apt-get update && apt-get install -y unzip curl`, `curl -fsSL -o /root/idea-incubator.zip https://github.com/jbellsolutions/idea-incubator-grokbot/releases/latest/download/idea-incubator.zip`, `rm -rf /root/pack && unzip -q /root/idea-incubator.zip -d /root/pack`, `bash /root/pack/worker-box/install.sh /root/pack`. Running it again later (a new pack version) keeps the keys, the logins and the builds.
 2. Keys, never in chat: `nano /opt/incubator/.secrets/worker.env` and fill the names (`DESK_REPO`, `GITHUB_TOKEN` scoped to the desk and private product repos, `GITHUB_OWNER`, `SLACK_WEBHOOK_URL`, optional `GUMROAD_ACCESS_TOKEN`, `ORGO_API_KEY`). Write the never-touch list to `/opt/incubator/.secrets/never-touch.txt`.
 3. Claude Code, as the coder user: on your Mac run `claude setup-token` (Claude subscription), then on the box `sudo -u incubator-coder -i`, add `export CLAUDE_CODE_OAUTH_TOKEN=<token>` to `~/.profile`, and `chmod 600 ~/.profile`.
-4. Codex, as the coder user: `sudo -u incubator-coder -i`, then `codex login` with your ChatGPT account (use its device-code option on a box with no browser) *(the headless login flow: check `codex login --help` on the box)*.
-5. Hermes: install Hermes for the `incubator` user, create the profile `incubator-worker` with [hermes/SOUL.md](hermes/SOUL.md), and give it a model key with a monthly cap (in the provider's console).
-6. Time: `timedatectl` must show UTC (DigitalOcean's default; on an Orgo computer run `timedatectl set-timezone UTC`), because the cron lines are UTC.
+4. Codex, as the coder user: `sudo -u incubator-coder -i`, then `codex login` with your ChatGPT account (`codex login --device-auth` on a box with no browser: it prints a code to enter at the address it shows; the flag is in codex-cli 0.167 and later).
+5. Hermes, as the jobs user: `sudo -u incubator -i`, then `curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash` (Hermes' own installer; it lands in `~/.local/bin/hermes`, which `HERMES_BIN` in `worker.env` points at), `hermes profile create incubator-worker`, `cp /opt/incubator/repo/worker-box/hermes/SOUL.md ~/.hermes/profiles/incubator-worker/SOUL.md`, then `hermes -p incubator-worker model` and paste a model key that has a monthly cap set in the provider's console. Check: `hermes -p incubator-worker chat -q "Reply ok" -Q --oneshot`. *(Not yet run on a real box: if the installer puts `hermes` somewhere else, set `HERMES_BIN` to what `command -v hermes` prints.)*
+6. Time and cron: `date` must show UTC (DigitalOcean's default; on an Orgo computer `ln -sf /usr/share/zoneinfo/UTC /etc/localtime`, since Orgo has no systemd and so no `timedatectl`), because the cron lines are UTC. `pgrep -x cron` must print a number: `install.sh` starts cron through systemd on a droplet and through supervisor on an Orgo computer, and warns if it couldn't.
 7. The check, as `incubator`: `python3 /opt/incubator/repo/worker-box/bin/worker.py lanes`, then `worker.py run digest`. The digest appears on the desk at `outbox/digest/<date>.md`.
 
 ## Why two users

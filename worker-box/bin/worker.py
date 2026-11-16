@@ -20,7 +20,7 @@ DESK = [sys.executable, str(PACK / "desk" / "desk.py")]
 SCRIPTS = HERE.parent
 CODER = os.environ.get("WORKER_CODER_USER", "")
 SLUG = re.compile(r"[^a-z0-9-]+")
-LIMIT = re.compile(r"usage limit|rate limit|quota|out of credits|5-hour limit|weekly limit|exceeded", re.I)
+LIMIT = re.compile(r"usage limit|rate limit|quota|out of (?:usage )?credits|5-hour limit|weekly limit|exceeded", re.I)
 os.environ.setdefault("DESK_SIDE", "worker")
 os.umask(0o002)  # builds are shared with the coder user through the incubator-coder group
 

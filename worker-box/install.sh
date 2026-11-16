@@ -15,12 +15,14 @@ id incubator >/dev/null 2>&1 || useradd -m -s /bin/bash incubator
 usermod -aG incubator-coder incubator
 mkdir -p $H/{repo,context,state,builds,log,.secrets}
 rsync -a --delete "$PACK/" $H/repo/
-chown -R incubator:incubator $H; chmod 700 $H/.secrets
+chown incubator:incubator $H; chown -R incubator:incubator $H/repo $H/context $H/state $H/log $H/.secrets; chmod 700 $H/.secrets
 # the coder may pass through /opt/incubator to builds/ and read the (public) pack, nothing else
 chmod 711 $H; chmod 750 $H/context $H/state $H/log
 touch $H/.secrets/worker.env; chmod 600 $H/.secrets/worker.env; chown incubator:incubator $H/.secrets/worker.env
 # shared builds: group incubator-coder, setgid, group-writable; both users work with umask 002
 chown incubator:incubator-coder $H/builds; chmod 2775 $H/builds
+# a re-install keeps earlier builds open to both users (group, group-write, setgid on folders); owners stay as they are
+chgrp -R incubator-coder $H/builds; chmod -R g+rwX $H/builds; find $H/builds -type d -exec chmod g+s {} +
 grep -q 'umask 002' /home/incubator-coder/.profile 2>/dev/null || echo 'umask 002' >> /home/incubator-coder/.profile
 chown incubator-coder:incubator-coder /home/incubator-coder/.profile; chmod 600 /home/incubator-coder/.profile
 for u in incubator incubator-coder; do
@@ -37,11 +39,12 @@ command -v codex >/dev/null || npm install -g @openai/codex >/dev/null
 command -v gh >/dev/null || apt-get install -y -qq gh >/dev/null || true
 # the coder's own Claude settings (user level is trusted in headless mode; each build folder gets a copy too)
 install -d -o incubator-coder -m 700 /home/incubator-coder/.claude
-install -o incubator-coder -m 600 $H/repo/skills/dev/claude-code-runner/settings.json /home/incubator-coder/.claude/settings.json
+install -o incubator-coder -g incubator-coder -m 600 $H/repo/skills/dev/claude-code-runner/settings.json /home/incubator-coder/.claude/settings.json
 grep -q WORKER_CODER_USER $H/.secrets/worker.env || cat >> $H/.secrets/worker.env <<'ENV'
 # names only until the owner fills them in (see repo/.env.example, worker section)
 export WORKER_CODER_USER=incubator-coder
 export DESK_SIDE=worker
+export HERMES_BIN=/home/incubator/.local/bin/hermes
 export DESK_REPO=
 export GITHUB_TOKEN=
 export GITHUB_OWNER=
@@ -50,5 +53,12 @@ export GUMROAD_ACCESS_TOKEN=
 export ORGO_API_KEY=
 ENV
 crontab -u incubator $H/repo/worker-box/crontab.txt
+# cron must be running: systemd starts it on a droplet; an Orgo computer has no systemd, so supervisor (or a plain start) does
+if [ -d /run/systemd/system ]; then systemctl enable --now cron >/dev/null 2>&1 || true
+elif command -v supervisorctl >/dev/null && [ -d /etc/supervisor/conf.d ]; then
+  printf '[program:incubator-cron]\ncommand=/usr/sbin/cron -f\nautostart=true\nautorestart=true\n' > /etc/supervisor/conf.d/incubator-cron.conf
+  pgrep -x cron >/dev/null || { supervisorctl reread >/dev/null && supervisorctl update >/dev/null; } || true
+else pgrep -x cron >/dev/null || service cron start >/dev/null 2>&1 || /usr/sbin/cron || true; fi
+pgrep -x cron >/dev/null || echo "warning: cron is not running; no scheduled job will fire until it is (service cron start)"
 [ "$(date +%Z)" = "UTC" ] || echo "warning: the box is not on UTC; the cron lines are UTC (timedatectl set-timezone UTC)"
 echo "installed. Next: the owner's steps in repo/worker-box/INSTALL.md (tokens, Hermes profile, the check)."
