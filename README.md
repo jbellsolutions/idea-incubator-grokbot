@@ -8,6 +8,7 @@ Built from the GrokBot Factory template. Idea: [../IDEA.md](../IDEA.md). Rules t
 |---|---|
 | [HANDOFF.md](HANDOFF.md) | Paste or attach to GrokBot: Justin's steps, then the bot's |
 | [NEEDS-JUSTIN.md](NEEDS-JUSTIN.md) | Sign-ins, keys by name, yeses |
+| [AGENTS.md](AGENTS.md), [agents/](agents/) | One agent per role: the bot to make for each, the line to paste into it, and its memory block. Written by `python3 tools/agents.py` |
 | [MASTER-PROMPT.md](MASTER-PROMPT.md) | The bot's master prompt |
 | [CHARTER.md](CHARTER.md) | Purpose, the loop, KPIs, handoffs, workspace, milestones. Wins over a role charter |
 | [worker-box/](worker-box/INSTALL.md) | The worker: install script, job lanes and tiers, runner, no-AI jobs, Hermes profile |
